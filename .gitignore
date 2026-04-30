@@ -1,0 +1,15 @@
+# Skill build artifacts
+brand.json
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Per-deck capture state (should never be committed — contains auth)
+*/capture-state/
+.capture-state/
+
+# Editor
+.vscode/
+.idea/
+.DS_Store

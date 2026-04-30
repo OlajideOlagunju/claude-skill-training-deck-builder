@@ -1,0 +1,45 @@
+{
+  "$schema": "https://example.com/training-deck-routes.schema.json",
+  "deck": "<deck-slug>",
+  "baseUrl": "http://localhost:3000",
+  "viewport": { "width": 1440, "height": 900 },
+  "auth": {
+    "mode": "manual",
+    "loginRoute": "/",
+    "comment": "First run: open headed browser, sign in manually, press Enter to continue. Auth state persists in capture-state/."
+  },
+  "screenshots": [
+    {
+      "id": "owner-01-action-list",
+      "role": "Action Owner",
+      "route": "/dashboard/hsse/actions",
+      "wait_for": "[data-testid='action-list-row']",
+      "fullPage": false,
+      "mask": ["[data-pii]"],
+      "comment": "Action list as the Owner sees it — should show 'My Actions' filter chip"
+    },
+    {
+      "id": "owner-02-action-detail-evidence",
+      "role": "Action Owner",
+      "route": "/dashboard/hsse/actions/{ACTION_ID}",
+      "actions": [
+        { "click_text": "Evidence" }
+      ],
+      "wait_for": ".evidence-tab-active",
+      "fullPage": false
+    },
+    {
+      "id": "reviewer-01-pending-review",
+      "role": "Reviewer",
+      "route": "/dashboard/hsse/actions",
+      "actions": [
+        { "click_text": "Pending Review" }
+      ],
+      "wait_for": "[data-testid='action-list-row']"
+    }
+  ],
+  "interpolations": {
+    "ACTION_ID": "An existing action ID in dev data — set this once and reuse",
+    "USER_ID": "A demo user ID"
+  }
+}

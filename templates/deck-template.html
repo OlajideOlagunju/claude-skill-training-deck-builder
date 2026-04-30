@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1280, initial-scale=1">
+<title>{{DECK_TITLE}}</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/white.css" id="theme">
+<style>
+  :root {
+    --brand-primary: {{BRAND_PRIMARY}};
+    --brand-primary-dark: {{BRAND_PRIMARY_DARK}};
+    --brand-primary-light: {{BRAND_PRIMARY_LIGHT}};
+    --brand-text: {{BRAND_TEXT}};
+    --brand-muted: {{BRAND_MUTED}};
+    --brand-border: {{BRAND_BORDER}};
+    --brand-success: {{BRAND_SUCCESS}};
+    --brand-warning: {{BRAND_WARNING}};
+    --brand-error: {{BRAND_ERROR}};
+    --brand-font: {{BRAND_FONT}};
+  }
+  .reveal {
+    font-family: var(--brand-font), system-ui, sans-serif;
+    color: var(--brand-text);
+  }
+  .reveal h1, .reveal h2, .reveal h3, .reveal h4 {
+    color: var(--brand-text);
+    text-transform: none;
+    letter-spacing: -0.01em;
+    font-weight: 600;
+  }
+  .reveal h1 { font-size: 2.4em; }
+  .reveal h2 {
+    font-size: 1.6em;
+    border-bottom: 3px solid var(--brand-primary);
+    padding-bottom: 0.2em;
+    margin-bottom: 0.5em;
+    display: inline-block;
+  }
+  .reveal h3 { font-size: 1.2em; color: var(--brand-primary); }
+  .reveal a { color: var(--brand-primary); }
+  .reveal strong { color: var(--brand-primary-dark); }
+  .reveal .progress { color: var(--brand-primary); height: 4px; }
+  .reveal .controls { color: var(--brand-primary); }
+  .reveal section.has-dark-background, .reveal section[data-background-color] {
+    color: white;
+  }
+  .reveal section[data-background-color] h1,
+  .reveal section[data-background-color] h2,
+  .reveal section[data-background-color] h3 {
+    color: white;
+    border-color: rgba(255,255,255,0.6);
+  }
+
+  /* Title slide */
+  .title-slide { text-align: center; }
+  .title-slide .brand-logo { height: 64px; margin-bottom: 1.5em; }
+  .title-slide h1 { font-size: 2.8em; margin-bottom: 0.2em; }
+  .title-slide .subtitle { color: var(--brand-muted); font-size: 1.1em; }
+  .title-slide .meta { margin-top: 2em; font-size: 0.7em; color: var(--brand-muted); }
+
+  /* Walkthrough slide layout */
+  .reveal section.walkthrough { text-align: left; }
+  .reveal .screenshot {
+    max-width: 100%;
+    max-height: 60vh;
+    border: 1px solid var(--brand-border);
+    border-radius: 6px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    object-fit: contain;
+    background: white;
+  }
+  .reveal .screenshot-wrap {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 0.6em;
+  }
+  .reveal ol, .reveal ul {
+    display: block;
+    margin-left: 1em;
+    text-align: left;
+  }
+  .reveal ol li, .reveal ul li { margin: 0.25em 0; line-height: 1.4; font-size: 0.85em; }
+
+  /* Role chapter cover */
+  .reveal section.role-cover {
+    background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-primary-dark) 100%);
+    color: white;
+    text-align: center;
+  }
+  .reveal section.role-cover h1 { color: white; font-size: 3em; }
+  .reveal section.role-cover .role-tagline {
+    font-size: 1.1em;
+    opacity: 0.9;
+    max-width: 700px;
+    margin: 0.5em auto;
+  }
+
+  /* Step badges */
+  .reveal .step {
+    display: inline-block;
+    background: var(--brand-primary);
+    color: white;
+    width: 1.4em;
+    height: 1.4em;
+    line-height: 1.4em;
+    text-align: center;
+    border-radius: 50%;
+    margin-right: 0.4em;
+    font-weight: 600;
+    font-size: 0.9em;
+  }
+
+  /* Role badge in slide corner */
+  .role-badge {
+    position: absolute;
+    top: 1em;
+    right: 1em;
+    background: var(--brand-primary-light);
+    color: var(--brand-primary-dark);
+    padding: 0.3em 0.8em;
+    border-radius: 999px;
+    font-size: 0.45em;
+    font-weight: 600;
+    border: 1px solid var(--brand-primary);
+  }
+
+  /* Status pills (mirror app status colors) */
+  .pill { display: inline-block; padding: 0.15em 0.6em; border-radius: 999px; font-size: 0.85em; font-weight: 500; }
+  .pill-pending { background: #FFF8E5; color: #D97706; border: 1px solid #FFECB3; }
+  .pill-approved { background: #E9FFF3; color: #04A850; border: 1px solid #C6FFE0; }
+  .pill-rejected { background: #FFF2F0; color: #B81719; border: 1px solid #FED2CB; }
+  .pill-overdue { background: #FFF2F0; color: #B81719; border: 1px solid #FED2CB; }
+
+  /* Two-column layouts */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5em; align-items: start; }
+
+  /* Callout box */
+  .callout {
+    background: var(--brand-primary-light);
+    border-left: 4px solid var(--brand-primary);
+    padding: 0.6em 1em;
+    border-radius: 4px;
+    font-size: 0.85em;
+  }
+  .callout.warn { background: #FFF8E5; border-color: #D97706; }
+  .callout.danger { background: #FFF2F0; border-color: #B81719; }
+
+  /* Footer with logo on every slide */
+  .reveal .slides::after {
+    content: "";
+    position: fixed;
+    bottom: 12px; left: 16px;
+    background-image: url("{{LOGO_PATH}}");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: left center;
+    width: 80px; height: 24px;
+    opacity: 0.5;
+    pointer-events: none;
+  }
+  .reveal section.title-slide ~ section .slides::after { display: block; }
+</style>
+</head>
+<body>
+<div class="reveal">
+  <div class="slides">
+    <section data-markdown="slides.md"
+             data-separator="^---$"
+             data-separator-vertical="^--$"
+             data-separator-notes="^Note:"
+             data-charset="utf-8">
+    </section>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/markdown/markdown.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/notes/notes.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/highlight.js"></script>
+<script>
+  Reveal.initialize({
+    width: 1280,
+    height: 720,
+    margin: 0.06,
+    minScale: 0.4,
+    maxScale: 2.0,
+    hash: true,
+    history: true,
+    slideNumber: 'c/t',
+    progress: true,
+    controls: true,
+    transition: 'slide',
+    plugins: [RevealMarkdown, RevealNotes, RevealHighlight]
+  });
+</script>
+</body>
+</html>
