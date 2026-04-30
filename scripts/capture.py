@@ -129,13 +129,26 @@ def main() -> int:
             page.goto(base_url)
             input("\n[capture] Sign in to the app in the open browser, then press Enter to continue... ")
 
+        # Roles that don't require a user switch (any signed-in user can see these).
+        NEUTRAL_ROLES = {"All", "All Users", "Any", "*", "", None}
+
         last_role = None
+        first_specific_role_seen = False
         for entry in entries:
             role = entry.get("role")
-            if role and role != last_role and not args.headless:
-                log(f"\nNext role: {role}. Switch user in browser if needed, then press Enter.")
-                input()
+            role_is_specific = role not in NEUTRAL_ROLES
+
+            if role_is_specific and role != last_role and not args.headless:
+                if first_specific_role_seen:
+                    # Genuine role transition — pause for user switch
+                    log(f"\nNext role: {role}. Switch user in browser if needed, then press Enter.")
+                    input()
+                else:
+                    # First specific role — user just logged in manually, no switch needed
+                    log(f"  (first specific role: {role} — assuming you're already signed in as this role)")
+                first_specific_role_seen = True
                 last_role = role
+
             try:
                 capture_one(page, entry, base_url, screenshots_dir)
             except Exception as e:
