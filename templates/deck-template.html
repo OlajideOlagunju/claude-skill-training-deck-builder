@@ -4,6 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=1280, initial-scale=1">
 <title>{{DECK_TITLE}}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/white.css" id="theme">
 <style>
@@ -17,51 +20,67 @@
     --brand-success: {{BRAND_SUCCESS}};
     --brand-warning: {{BRAND_WARNING}};
     --brand-error: {{BRAND_ERROR}};
-    --brand-font: {{BRAND_FONT}};
+    --font-display: 'Manrope', {{BRAND_FONT}}, system-ui, sans-serif;
+    --font-body: {{BRAND_FONT}}, 'Inter', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+    /* Layered shadows for depth */
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.06);
+    --shadow-md: 0 1px 2px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.05);
+    --shadow-lg: 0 1px 2px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.08), 0 16px 40px rgba(0,0,0,0.04);
   }
-  .reveal {
-    font-family: var(--brand-font), system-ui, sans-serif;
-    color: var(--brand-text);
-  }
+
+  /* ─── Base typography ────────────────────────────────────────────────── */
+  .reveal { font-family: var(--font-body); color: var(--brand-text); font-weight: 400; }
   .reveal h1, .reveal h2, .reveal h3, .reveal h4 {
+    font-family: var(--font-display);
     color: var(--brand-text);
     text-transform: none;
-    letter-spacing: -0.01em;
-    font-weight: 600;
+    letter-spacing: -0.018em;
+    font-weight: 700;
+    line-height: 1.15;
   }
   .reveal h1 { font-size: 2.4em; }
   .reveal h2 {
-    font-size: 1.6em;
+    font-size: 1.5em;
     border-bottom: 3px solid var(--brand-primary);
-    padding-bottom: 0.2em;
-    margin-bottom: 0.5em;
+    padding-bottom: 0.22em;
+    margin-bottom: 0.55em;
     display: inline-block;
   }
-  .reveal h3 { font-size: 1.2em; color: var(--brand-primary); }
+  .reveal h3 { font-size: 1.15em; color: var(--brand-primary-dark); font-weight: 600; }
   .reveal a { color: var(--brand-primary); }
-  .reveal strong { color: var(--brand-primary-dark); }
+  .reveal strong { color: var(--brand-primary-dark); font-weight: 700; }
   .reveal code {
     background: var(--brand-primary-light);
     color: var(--brand-primary-dark);
-    padding: 0.05em 0.4em; border-radius: 3px;
+    padding: 0.05em 0.45em;
+    border-radius: 4px;
     font-size: 0.85em;
-    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-family: var(--font-mono);
+    border: 1px solid color-mix(in oklab, var(--brand-primary) 18%, transparent);
   }
   .reveal .progress { color: var(--brand-primary); height: 4px; }
   .reveal .controls { color: var(--brand-primary); }
-  .reveal section.has-dark-background, .reveal section[data-background-color] {
-    color: white;
+  .reveal .slide-number {
+    background: rgba(0,0,0,0.04);
+    color: var(--brand-text);
+    border-radius: 4px;
+    padding: 0.15em 0.5em;
+    font-family: var(--font-mono);
+    font-size: 0.7em;
   }
+
+  /* ─── Inverted inline colors on dark / branded backgrounds ───────────── */
+  .reveal section.has-dark-background,
+  .reveal section[data-background-color] { color: white; }
+  .reveal section.role-cover h1, .reveal section.role-cover h2, .reveal section.role-cover h3,
   .reveal section[data-background-color] h1,
   .reveal section[data-background-color] h2,
   .reveal section[data-background-color] h3 {
     color: white;
-    border-color: rgba(255,255,255,0.6);
+    border-color: rgba(255,255,255,0.55);
   }
-  /* Inverted inline-element colors on colored / role-cover backgrounds for legibility.
-     Without these, brand-color <strong>/<code>/<a> become invisible on the brand-color background. */
-  .reveal section.role-cover strong,
-  .reveal section.role-cover a,
+  .reveal section.role-cover strong, .reveal section.role-cover a,
   .reveal section[data-background-color] strong,
   .reveal section[data-background-color] a {
     color: white;
@@ -69,132 +88,286 @@
   }
   .reveal section.role-cover code,
   .reveal section[data-background-color] code {
-    background: rgba(255,255,255,0.18);
+    background: rgba(255,255,255,0.16);
     color: white;
-    border: 1px solid rgba(255,255,255,0.3);
+    border-color: rgba(255,255,255,0.3);
   }
 
-  /* Title slide */
-  .title-slide { text-align: center; }
-  .title-slide .brand-logo { height: 64px; margin-bottom: 1.5em; }
-  .title-slide h1 { font-size: 2.8em; margin-bottom: 0.2em; }
-  .title-slide .subtitle { color: var(--brand-muted); font-size: 1.1em; }
-  .title-slide .meta { margin-top: 2em; font-size: 0.7em; color: var(--brand-muted); }
+  /* ─── Title slide — asymmetric, atmospheric ───────────────────────────── */
+  .reveal section.title-slide {
+    text-align: left;
+    padding: 0 2.5em;
+    background:
+      radial-gradient(60% 50% at 18% 25%, color-mix(in oklab, var(--brand-primary) 8%, transparent) 0%, transparent 70%),
+      radial-gradient(50% 40% at 88% 78%, color-mix(in oklab, var(--brand-primary-dark) 6%, transparent) 0%, transparent 70%);
+  }
+  .reveal section.title-slide::before {
+    content: "";
+    display: block;
+    width: 64px; height: 4px;
+    background: var(--brand-primary);
+    margin: 0 0 1.4em 0;
+  }
+  .reveal section.title-slide h1 {
+    font-size: 3.1em;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    line-height: 1;
+    margin: 0 0 0.4em 0;
+    max-width: 14ch;
+  }
+  .reveal section.title-slide h3,
+  .reveal section.title-slide .subtitle {
+    font-family: var(--font-body);
+    font-size: 1.05em;
+    font-weight: 400;
+    color: var(--brand-text);
+    border: none;
+    margin: 0 0 2em 0;
+    max-width: 50ch;
+  }
+  .reveal section.title-slide .meta {
+    font-family: var(--font-mono);
+    font-size: 0.55em;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--brand-muted);
+    font-weight: 500;
+  }
 
-  /* Walkthrough slide layout */
-  .reveal section.walkthrough { text-align: left; }
+  /* ─── Role chapter cover — branded with subtle texture ───────────────── */
+  .reveal section.role-cover {
+    background:
+      radial-gradient(60% 50% at 25% 20%, rgba(255,255,255,0.16) 0%, transparent 60%),
+      linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-primary-dark) 100%);
+    color: white;
+    text-align: left;
+    padding: 0 2.5em;
+    position: relative;
+    overflow: hidden;
+  }
+  .reveal section.role-cover::before {
+    content: "";
+    position: absolute; inset: 0;
+    background-image: radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px);
+    background-size: 24px 24px;
+    pointer-events: none;
+    mask-image: linear-gradient(135deg, black 0%, black 40%, transparent 80%);
+    -webkit-mask-image: linear-gradient(135deg, black 0%, black 40%, transparent 80%);
+  }
+  .reveal section.role-cover > * { position: relative; z-index: 1; }
+  .reveal section.role-cover h1 {
+    font-size: 3em;
+    font-weight: 800;
+    letter-spacing: -0.022em;
+    margin: 0 0 0.5em 0;
+  }
+  .reveal section.role-cover blockquote {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    font-style: normal;
+    font-size: 1em;
+    line-height: 1.55;
+    margin: 0;
+    padding: 0;
+    max-width: 620px;
+    quotes: none;
+    color: rgba(255,255,255,0.92);
+  }
+  .reveal section.role-cover blockquote::before { content: ""; display: block; width: 40px; height: 3px; background: rgba(255,255,255,0.6); margin-bottom: 1em; }
+  .reveal section.role-cover blockquote::after { content: none; }
+
+  /* ─── Walkthrough slide ───────────────────────────────────────────────── */
+  .reveal section.walkthrough { text-align: left; padding: 0 1em; }
   .reveal .screenshot {
     max-width: 100%;
-    max-height: 60vh;
+    max-height: 54vh;
     border: 1px solid var(--brand-border);
-    border-radius: 6px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-    object-fit: contain;
+    border-radius: 8px;
     background: white;
+    box-shadow: var(--shadow-lg);
+    object-fit: contain;
   }
   .reveal .screenshot-wrap {
     display: flex;
     justify-content: center;
-    margin-bottom: 0.6em;
+    margin-bottom: 0.7em;
   }
-  .reveal ol, .reveal ul {
-    display: block;
-    margin-left: 1em;
-    text-align: left;
-  }
-  .reveal ol li, .reveal ul li { margin: 0.25em 0; line-height: 1.4; font-size: 0.85em; }
 
-  /* Role chapter cover */
-  .reveal section.role-cover {
+  /* Broken-image fallback (a JS handler adds .screenshot-missing) */
+  .reveal .screenshot-wrap.screenshot-missing {
+    background: linear-gradient(135deg, var(--brand-primary-light) 0%, white 100%);
+    border: 2px dashed var(--brand-primary);
+    min-height: 36vh;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--brand-primary-dark);
+    font-size: 0.75em;
+    font-weight: 600;
+    flex-direction: column;
+    gap: 0.4em;
+  }
+  .reveal .screenshot-wrap.screenshot-missing::before {
+    content: "Screenshot pending";
+    font-family: var(--font-display);
+    font-size: 1.4em;
+    font-weight: 700;
+    color: var(--brand-primary);
+  }
+  .reveal .screenshot-wrap.screenshot-missing::after {
+    content: "Run capture.py against the dev server to populate";
+    font-style: italic;
+    font-weight: 400;
+    color: var(--brand-primary-dark);
+    opacity: 0.75;
+  }
+
+  /* Default ul/ol */
+  .reveal ol, .reveal ul { display: block; margin-left: 1em; text-align: left; font-size: 0.78em; }
+  .reveal ol li, .reveal ul li { margin: 0.22em 0; line-height: 1.5; }
+
+  /* ─── Numbered step lists ────────────────────────────────────────────── */
+  /* CRITICAL: badge is absolutely positioned (NOT flex/text-indent) so inline-block
+     children of the li (pills, code, strong) flow normally without whitespace collapse. */
+  .reveal .steps {
+    list-style: none;
+    margin: 0 0 0.5em;
+    padding: 0;
+  }
+  .reveal .steps li {
+    position: relative;
+    padding-left: 2.4em;
+    margin-bottom: 0.55em;
+    font-size: 0.8em;
+    line-height: 1.5;
+  }
+  .reveal .step {
+    position: absolute;
+    left: 0;
+    top: 0.05em;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.7em;
+    height: 1.7em;
+    border-radius: 50%;
     background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-primary-dark) 100%);
     color: white;
-    text-align: center;
-  }
-  .reveal section.role-cover h1 { color: white; font-size: 3em; }
-  .reveal section.role-cover .role-tagline {
-    font-size: 1.1em;
-    opacity: 0.9;
-    max-width: 700px;
-    margin: 0.5em auto;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.78em;
+    box-shadow: 0 2px 6px color-mix(in oklab, var(--brand-primary) 35%, transparent);
   }
 
-  /* Step badges & numbered-step lists.
-     Use display: block (not flex) on the <li> — flex collapses whitespace at item
-     boundaries, which removes the space between text and adjacent <strong>/<code>. */
-  .reveal .step {
-    display: inline-block;
-    background: var(--brand-primary);
-    color: white;
-    width: 1.4em;
-    height: 1.4em;
-    line-height: 1.4em;
-    text-align: center;
-    border-radius: 50%;
-    margin-right: 0.5em;
-    font-weight: 600;
-    font-size: 0.85em;
-    text-indent: 0;
-    vertical-align: 1px;
+  /* Staggered entrance for steps when slide becomes visible */
+  .reveal section.present .steps li {
+    animation: stepIn 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
   }
-  .reveal .steps { list-style: none; margin: 0 0 0.5em; padding: 0; }
-  .reveal .steps li {
-    display: block;
-    margin-bottom: 0.5em;
-    font-size: 0.75em;
-    line-height: 1.45;
-    padding-left: 2em;
-    text-indent: -2em;
+  .reveal section.present .steps li:nth-child(1) { animation-delay: 0.10s; }
+  .reveal section.present .steps li:nth-child(2) { animation-delay: 0.20s; }
+  .reveal section.present .steps li:nth-child(3) { animation-delay: 0.30s; }
+  .reveal section.present .steps li:nth-child(4) { animation-delay: 0.40s; }
+  .reveal section.present .steps li:nth-child(5) { animation-delay: 0.50s; }
+  .reveal section.present .steps li:nth-child(6) { animation-delay: 0.60s; }
+  @keyframes stepIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
   }
 
-  /* Role badge in slide corner */
+  /* ─── Role badge in slide corner ─────────────────────────────────────── */
   .role-badge {
     position: absolute;
-    top: 1em;
-    right: 1em;
+    top: 1em; right: 1em;
     background: var(--brand-primary-light);
     color: var(--brand-primary-dark);
-    padding: 0.3em 0.8em;
+    padding: 0.3em 0.9em;
     border-radius: 999px;
-    font-size: 0.45em;
-    font-weight: 600;
-    border: 1px solid var(--brand-primary);
+    font-size: 0.5em;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    border: 1px solid color-mix(in oklab, var(--brand-primary) 50%, transparent);
   }
 
-  /* Status pills (mirror app status colors) */
-  .pill { display: inline-block; padding: 0.15em 0.6em; border-radius: 999px; font-size: 0.85em; font-weight: 500; }
-  .pill-pending { background: #FFF8E5; color: #D97706; border: 1px solid #FFECB3; }
+  /* ─── Status pills ───────────────────────────────────────────────────── */
+  .pill {
+    display: inline-block;
+    padding: 0.2em 0.7em;
+    border-radius: 999px;
+    font-size: 0.85em;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+    vertical-align: 0.05em;
+  }
+  .pill-pending  { background: #FFF8E5; color: #D97706; border: 1px solid #FFECB3; }
   .pill-approved { background: #E9FFF3; color: #04A850; border: 1px solid #C6FFE0; }
   .pill-rejected { background: #FFF2F0; color: #B81719; border: 1px solid #FED2CB; }
-  .pill-overdue { background: #FFF2F0; color: #B81719; border: 1px solid #FED2CB; }
+  .pill-overdue  { background: #FFF2F0; color: #B81719; border: 1px solid #FED2CB; }
+  .pill-active   { background: #E9FFF3; color: #04A850; border: 1px solid #C6FFE0; }
+  .pill-draft    { background: #F3F5F7; color: #555; border: 1px solid #D2D7E0; }
+  .pill-review   { background: #FFF8E5; color: #D97706; border: 1px solid #FFECB3; }
+  .pill-closed   { background: #F3F5F7; color: #555; border: 1px solid #D2D7E0; }
 
-  /* Two-column layouts */
-  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5em; align-items: start; }
+  /* ─── Layouts ─────────────────────────────────────────────────────────── */
+  .two-col   { display: grid; grid-template-columns: 1fr 1fr;       gap: 1.6em; align-items: start; font-size: 0.82em; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr;   gap: 1.2em; align-items: start; font-size: 0.72em; }
 
-  /* Callout box */
+  .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.9em; }
+  .kpi-card {
+    background: white;
+    border: 1px solid var(--brand-border);
+    border-radius: 10px;
+    padding: 1em 1.1em;
+    text-align: left;
+    box-shadow: var(--shadow-sm);
+  }
+  .kpi-card .num   { font-family: var(--font-display); font-size: 2.1em; font-weight: 800; color: var(--brand-primary); line-height: 1; letter-spacing: -0.02em; }
+  .kpi-card .label { color: var(--brand-muted); font-size: 0.8em; margin-top: 0.4em; }
+
+  /* ─── Callouts ───────────────────────────────────────────────────────── */
   .callout {
     background: var(--brand-primary-light);
     border-left: 4px solid var(--brand-primary);
-    padding: 0.6em 1em;
-    border-radius: 4px;
-    font-size: 0.85em;
+    padding: 0.8em 1.2em;
+    border-radius: 0 8px 8px 0;
+    font-size: 0.78em;
+    text-align: left;
+    box-shadow: var(--shadow-sm);
+    margin: 0.4em 0;
   }
-  .callout.warn { background: #FFF8E5; border-color: #D97706; }
+  .callout.warn   { background: #FFF8E5; border-color: #D97706; }
   .callout.danger { background: #FFF2F0; border-color: #B81719; }
+  .callout.info   { background: #EFF6FF; border-color: #2563EB; }
 
-  /* Footer with logo on every slide */
+  /* ─── Footer logo (left) — slide number stays right ──────────────────── */
   .reveal .slides::after {
     content: "";
     position: fixed;
-    bottom: 12px; left: 16px;
+    bottom: 14px; left: 18px;
     background-image: url("{{LOGO_PATH}}");
     background-size: contain;
     background-repeat: no-repeat;
     background-position: left center;
-    width: 80px; height: 24px;
+    width: 90px; height: 26px;
     opacity: 0.5;
     pointer-events: none;
+    z-index: 10;
   }
-  .reveal section.title-slide ~ section .slides::after { display: block; }
+
+  /* ─── Print-friendly (PDF export) ────────────────────────────────────── */
+  @media print {
+    .reveal section.present .steps li { animation: none !important; opacity: 1 !important; transform: none !important; }
+    .reveal .screenshot { box-shadow: none; }
+  }
+
+  /* ─── Reduced motion ─────────────────────────────────────────────────── */
+  @media (prefers-reduced-motion: reduce) {
+    .reveal section.present .steps li { animation: none; opacity: 1; transform: none; }
+  }
 </style>
 </head>
 <body>
@@ -208,23 +381,28 @@
     </section>
   </div>
 </div>
+<script>
+  // Replace broken <img.screenshot> elements with a styled placeholder card.
+  // img error events don't bubble — so we listen on the window in capture phase.
+  window.addEventListener('error', (e) => {
+    if (e.target && e.target.tagName === 'IMG' && e.target.classList.contains('screenshot')) {
+      e.target.style.display = 'none';
+      const wrap = e.target.closest('.screenshot-wrap');
+      if (wrap) wrap.classList.add('screenshot-missing');
+    }
+  }, true);
+</script>
 <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/markdown/markdown.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/notes/notes.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/highlight.js"></script>
 <script>
   Reveal.initialize({
-    width: 1280,
-    height: 720,
-    margin: 0.06,
-    minScale: 0.4,
-    maxScale: 2.0,
-    hash: true,
-    history: true,
-    slideNumber: 'c/t',
-    progress: true,
-    controls: true,
-    transition: 'slide',
+    width: 1280, height: 720, margin: 0.06,
+    minScale: 0.4, maxScale: 2.0,
+    hash: true, history: true, slideNumber: 'c/t',
+    progress: true, controls: true,
+    transition: 'slide', backgroundTransition: 'fade',
     plugins: [RevealMarkdown, RevealNotes, RevealHighlight]
   });
 </script>
