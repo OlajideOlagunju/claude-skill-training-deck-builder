@@ -40,6 +40,13 @@
   .reveal h3 { font-size: 1.2em; color: var(--brand-primary); }
   .reveal a { color: var(--brand-primary); }
   .reveal strong { color: var(--brand-primary-dark); }
+  .reveal code {
+    background: var(--brand-primary-light);
+    color: var(--brand-primary-dark);
+    padding: 0.05em 0.4em; border-radius: 3px;
+    font-size: 0.85em;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
   .reveal .progress { color: var(--brand-primary); height: 4px; }
   .reveal .controls { color: var(--brand-primary); }
   .reveal section.has-dark-background, .reveal section[data-background-color] {
@@ -50,6 +57,21 @@
   .reveal section[data-background-color] h3 {
     color: white;
     border-color: rgba(255,255,255,0.6);
+  }
+  /* Inverted inline-element colors on colored / role-cover backgrounds for legibility.
+     Without these, brand-color <strong>/<code>/<a> become invisible on the brand-color background. */
+  .reveal section.role-cover strong,
+  .reveal section.role-cover a,
+  .reveal section[data-background-color] strong,
+  .reveal section[data-background-color] a {
+    color: white;
+    text-decoration-color: rgba(255,255,255,0.5);
+  }
+  .reveal section.role-cover code,
+  .reveal section[data-background-color] code {
+    background: rgba(255,255,255,0.18);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.3);
   }
 
   /* Title slide */
@@ -96,7 +118,9 @@
     margin: 0.5em auto;
   }
 
-  /* Step badges */
+  /* Step badges & numbered-step lists.
+     Use display: block (not flex) on the <li> — flex collapses whitespace at item
+     boundaries, which removes the space between text and adjacent <strong>/<code>. */
   .reveal .step {
     display: inline-block;
     background: var(--brand-primary);
@@ -106,9 +130,20 @@
     line-height: 1.4em;
     text-align: center;
     border-radius: 50%;
-    margin-right: 0.4em;
+    margin-right: 0.5em;
     font-weight: 600;
-    font-size: 0.9em;
+    font-size: 0.85em;
+    text-indent: 0;
+    vertical-align: 1px;
+  }
+  .reveal .steps { list-style: none; margin: 0 0 0.5em; padding: 0; }
+  .reveal .steps li {
+    display: block;
+    margin-bottom: 0.5em;
+    font-size: 0.75em;
+    line-height: 1.45;
+    padding-left: 2em;
+    text-indent: -2em;
   }
 
   /* Role badge in slide corner */
