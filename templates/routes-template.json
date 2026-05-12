@@ -6,7 +6,18 @@
   "auth": {
     "mode": "manual",
     "loginRoute": "/",
-    "comment": "First run: open headed browser, sign in manually, press Enter to continue. Auth state persists in capture-state/."
+    "comment": "Pick ONE mode. 'manual' opens a headed browser and waits on stdin for you to sign in (state then persists in .capture-state/ so future --headless runs reuse the session). 'form' fills a username/password login form automatically.",
+    "_formExample": {
+      "mode": "form",
+      "loginRoute": "/login",
+      "userSelector": "input[name='email'], input[type='email']",
+      "passwordSelector": "input[name='password'], input[type='password']",
+      "submitSelector": "button[type='submit']",
+      "successWaitFor": "nav, .sidebar, [data-testid='app-shell']",
+      "userEnv": "CAPTURE_USER",
+      "passEnv": "CAPTURE_PASS",
+      "_credentials": "Set via --username / --password CLI flags, or via the env vars named above. Never commit credentials to routes.json."
+    }
   },
   "screenshots": [
     {
