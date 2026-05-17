@@ -157,21 +157,24 @@
   }
   .reveal section.role-cover > * { position: relative; z-index: 1; }
   .reveal section.role-cover h1 {
-    font-size: 3em;
+    font-size: 2.7em;
     font-weight: 800;
     letter-spacing: -0.022em;
     margin: 0 0 0.5em 0;
+    overflow-wrap: break-word;
+    word-break: normal;
   }
   .reveal section.role-cover blockquote {
     background: transparent;
     border: none;
     box-shadow: none;
     font-style: normal;
-    font-size: 1em;
+    font-size: 1.05em;
     line-height: 1.55;
     margin: 0;
     padding: 0;
-    max-width: 620px;
+    max-width: none;
+    width: 100%;
     quotes: none;
     color: rgba(255,255,255,0.92);
   }
@@ -358,15 +361,167 @@
     z-index: 10;
   }
 
+  /* ─── Floating left-side TOC / quick-nav panel ────────────────────────── */
+  .toc-panel {
+    position: fixed;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    width: 260px;
+    max-height: 88vh;
+    background: rgba(255,255,255,0.97);
+    border: 1px solid var(--brand-border);
+    border-left: none;
+    border-radius: 0 12px 12px 0;
+    box-shadow: var(--shadow-lg);
+    z-index: 100;
+    font-family: var(--font-body);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.25s cubic-bezier(0.2,0.8,0.2,1);
+  }
+  /* When collapsed the panel slides fully off-screen — the floating opener button
+     (.toc-fab) takes over as the affordance. */
+  .toc-panel.collapsed {
+    transform: translate(-100%, -50%);
+    pointer-events: none;
+  }
+  .toc-panel__header {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.6em 0.9em;
+    background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-primary-dark) 100%);
+    color: white;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    border-radius: 0 12px 0 0;
+  }
+  .toc-panel__toggle {
+    background: var(--brand-primary);
+    color: white;
+    border: none;
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 0.95rem;
+    line-height: 1;
+    font-weight: 700;
+    box-shadow: var(--shadow-sm);
+  }
+  .toc-panel__toggle:hover { background: var(--brand-primary-dark); }
+  .toc-panel__list {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    list-style: none;
+    margin: 0;
+    padding: 0.4em 0;
+    text-align: left;
+    font-size: 0.78rem;
+  }
+  .toc-panel__list li { margin: 0; padding: 0; line-height: 1.35; }
+  .toc-panel__list a {
+    display: flex;
+    gap: 0.55em;
+    align-items: baseline;
+    padding: 0.42em 0.95em 0.42em 0.85em;
+    color: var(--brand-text);
+    text-decoration: none;
+    border-left: 3px solid transparent;
+  }
+  .toc-panel__list a:hover { background: var(--brand-primary-light); }
+  .toc-panel__list a.is-current {
+    background: var(--brand-primary-light);
+    border-left-color: var(--brand-primary);
+    font-weight: 700;
+    color: var(--brand-primary-dark);
+  }
+  .toc-panel__list .toc-num {
+    flex: 0 0 1.6em;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--brand-muted);
+  }
+  .toc-panel__list a.is-current .toc-num { color: var(--brand-primary-dark); }
+  .toc-panel__list .toc-section {
+    padding: 0.7em 0.95em 0.25em;
+    font-family: var(--font-display);
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--brand-primary-dark);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    border-top: 1px solid var(--brand-border);
+    margin-top: 0.3em;
+  }
+  .toc-panel__list .toc-section:first-child { border-top: none; margin-top: 0; }
+
+  @media (max-width: 1100px) {
+    .toc-panel { width: 220px; }
+  }
+
+  /* ─── Floating opener button (visible only while panel is collapsed) ───── */
+  .toc-fab {
+    position: fixed;
+    top: 50%;
+    left: 16px;
+    transform: translateY(-50%);
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-primary-dark) 100%);
+    color: white;
+    box-shadow: 0 6px 18px color-mix(in oklab, var(--brand-primary) 45%, transparent), var(--shadow-md);
+    z-index: 101;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+  }
+  .toc-fab::before {
+    /* Pulsing halo */
+    content: "";
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    background: var(--brand-primary);
+    opacity: 0.5;
+    z-index: -1;
+    animation: tocFabPulse 2.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  .toc-fab svg { width: 22px; height: 22px; }
+  .toc-fab:hover { transform: translateY(-50%) scale(1.06); box-shadow: 0 8px 22px color-mix(in oklab, var(--brand-primary) 55%, transparent), var(--shadow-lg); }
+  .toc-fab:active { transform: translateY(-50%) scale(0.98); }
+  .toc-fab.is-hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-50%) scale(0.6);
+  }
+  .toc-fab.is-hidden::before { animation: none; }
+  @keyframes tocFabPulse {
+    0%   { transform: scale(1);   opacity: 0.55; }
+    70%  { transform: scale(1.35); opacity: 0;    }
+    100% { transform: scale(1.35); opacity: 0;    }
+  }
+
   /* ─── Print-friendly (PDF export) ────────────────────────────────────── */
   @media print {
     .reveal section.present .steps li { animation: none !important; opacity: 1 !important; transform: none !important; }
     .reveal .screenshot { box-shadow: none; }
+    .toc-panel { display: none !important; }
+    .toc-fab { display: none !important; }
   }
 
   /* ─── Reduced motion ─────────────────────────────────────────────────── */
   @media (prefers-reduced-motion: reduce) {
     .reveal section.present .steps li { animation: none; opacity: 1; transform: none; }
+    .toc-fab::before { animation: none; }
   }
 </style>
 </head>
@@ -381,6 +536,22 @@
     </section>
   </div>
 </div>
+
+<aside class="toc-panel collapsed" id="tocPanel" aria-label="Slide navigation">
+  <div class="toc-panel__header">
+    <span>Quick Nav</span>
+    <button class="toc-panel__toggle" id="tocToggle" type="button" aria-label="Collapse navigation" title="Collapse">&laquo;</button>
+  </div>
+  <ol class="toc-panel__list" id="tocList"></ol>
+</aside>
+<button class="toc-fab" id="tocFab" type="button" aria-label="Open slide navigation" title="Slide navigation">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <line x1="4" y1="7"  x2="20" y2="7"/>
+    <line x1="4" y1="12" x2="20" y2="12"/>
+    <line x1="4" y1="17" x2="14" y2="17"/>
+  </svg>
+</button>
+
 <script>
   // Replace broken <img.screenshot> elements with a styled placeholder card.
   // img error events don't bubble — so we listen on the window in capture phase.
@@ -404,6 +575,102 @@
     progress: true, controls: true,
     transition: 'slide', backgroundTransition: 'fade',
     plugins: [RevealMarkdown, RevealNotes, RevealHighlight]
+  }).then(() => {
+    // ─── Build the floating TOC from the rendered slides ────────────────
+    const list = document.getElementById('tocList');
+    const panel = document.getElementById('tocPanel');
+    const toggle = document.getElementById('tocToggle');
+    const fab = document.getElementById('tocFab');
+    if (!list || !panel || !toggle || !fab) return;
+
+    function syncFab() {
+      const collapsed = panel.classList.contains('collapsed');
+      fab.classList.toggle('is-hidden', !collapsed);
+    }
+
+    function deriveLabel(section) {
+      // 1) Role-cover (chapter divider) — show as a section header
+      if (section.classList.contains('role-cover')) {
+        const h1 = section.querySelector('h1');
+        return { kind: 'section', text: h1 ? h1.textContent.trim() : 'Section' };
+      }
+      // 2) Title slide
+      if (section.classList.contains('title-slide')) {
+        const h1 = section.querySelector('h1');
+        return { kind: 'slide', text: h1 ? h1.textContent.trim() : 'Title' };
+      }
+      // 3) Use the first heading, falling back to the first non-empty line
+      const heading = section.querySelector('h1, h2, h3');
+      if (heading) return { kind: 'slide', text: heading.textContent.trim() };
+      const txt = (section.textContent || '').trim().split('\n')[0].slice(0, 60);
+      return { kind: 'slide', text: txt || 'Slide' };
+    }
+
+    function build() {
+      list.innerHTML = '';
+      const sections = document.querySelectorAll('.reveal .slides > section');
+      let slideNum = 0;
+      sections.forEach((section, idx) => {
+        const verticals = section.querySelectorAll(':scope > section');
+        if (verticals.length) {
+          verticals.forEach((v, vIdx) => addRow(v, idx, vIdx, ++slideNum));
+        } else {
+          addRow(section, idx, 0, ++slideNum);
+        }
+      });
+    }
+
+    function addRow(section, h, v, num) {
+      const { kind, text } = deriveLabel(section);
+      const li = document.createElement('li');
+      if (kind === 'section') {
+        li.className = 'toc-section';
+        li.textContent = text;
+      } else {
+        const a = document.createElement('a');
+        a.href = '#';
+        a.dataset.h = h; a.dataset.v = v;
+        a.innerHTML = `<span class="toc-num">${num}</span><span class="toc-label"></span>`;
+        a.querySelector('.toc-label').textContent = text;
+        a.addEventListener('click', (e) => {
+          e.preventDefault();
+          Reveal.slide(Number(a.dataset.h), Number(a.dataset.v));
+        });
+        li.appendChild(a);
+      }
+      list.appendChild(li);
+    }
+
+    function highlight() {
+      const idx = Reveal.getIndices();
+      list.querySelectorAll('a').forEach(a => {
+        const isCurrent = Number(a.dataset.h) === idx.h && Number(a.dataset.v) === (idx.v || 0);
+        a.classList.toggle('is-current', isCurrent);
+        if (isCurrent) a.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      });
+    }
+
+    toggle.addEventListener('click', () => {
+      const collapsed = panel.classList.toggle('collapsed');
+      toggle.textContent = collapsed ? '»' : '«';
+      toggle.title = collapsed ? 'Expand' : 'Collapse';
+      toggle.setAttribute('aria-label', collapsed ? 'Expand navigation' : 'Collapse navigation');
+      syncFab();
+    });
+
+    fab.addEventListener('click', () => {
+      panel.classList.remove('collapsed');
+      toggle.textContent = '«';
+      toggle.title = 'Collapse';
+      toggle.setAttribute('aria-label', 'Collapse navigation');
+      syncFab();
+    });
+
+    build();
+    highlight();
+    syncFab();
+    Reveal.on('slidechanged', highlight);
+    Reveal.on('ready', highlight);
   });
 </script>
 </body>
