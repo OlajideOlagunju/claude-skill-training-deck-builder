@@ -460,6 +460,64 @@
   }
   .toc-panel__list .toc-section:first-child { border-top: none; margin-top: 0; }
 
+  /* ─── Export-to-PDF action (panel footer) ─────────────────────────────── */
+  .toc-panel__footer {
+    flex: 0 0 auto;
+    padding: 0.6em 0.7em;
+    border-top: 1px solid var(--brand-border);
+  }
+  .toc-export {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5em;
+    background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-primary-dark) 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 0.6em 0.9em;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.78rem;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+  }
+  .toc-export:hover { filter: brightness(1.06); box-shadow: var(--shadow-md); }
+  .toc-export svg { width: 15px; height: 15px; }
+
+  /* ─── Print-mode helper bar (only on screen in ?print-pdf view) ───────── */
+  body.is-print-pdf .toc-panel,
+  body.is-print-pdf .toc-fab { display: none !important; }
+  .pdf-print-bar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 200;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6em 1.1em;
+    padding: 0.7em 1.2em;
+    background: var(--brand-primary-dark);
+    color: white;
+    font-family: var(--font-body);
+    font-size: 0.92rem;
+    box-shadow: var(--shadow-md);
+  }
+  .pdf-print-bar strong { color: white; }
+  .pdf-print-bar button {
+    background: white;
+    color: var(--brand-primary-dark);
+    border: none;
+    border-radius: 6px;
+    padding: 0.45em 1.1em;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .pdf-print-bar button:hover { filter: brightness(0.96); }
+  @media print { .pdf-print-bar { display: none !important; } }
+
   @media (max-width: 1100px) {
     .toc-panel { width: 220px; }
   }
@@ -543,7 +601,19 @@
     <button class="toc-panel__toggle" id="tocToggle" type="button" aria-label="Collapse navigation" title="Collapse">&laquo;</button>
   </div>
   <ol class="toc-panel__list" id="tocList"></ol>
+  <div class="toc-panel__footer">
+    <button class="toc-export" id="tocExport" type="button" title="Export this deck as a landscape PDF">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M12 3v12"/><path d="m7 12 5 5 5-5"/><path d="M5 21h14"/>
+      </svg>
+      Export as PDF
+    </button>
+  </div>
 </aside>
+<div class="pdf-print-bar" id="pdfPrintBar" hidden>
+  <span>PDF export view. In the print dialog choose <strong>Layout: Landscape</strong>, <strong>Margins: None</strong>, and enable <strong>Background graphics</strong>.</span>
+  <button id="pdfPrintNow" type="button">Save as PDF</button>
+</div>
 <button class="toc-fab" id="tocFab" type="button" aria-label="Open slide navigation" title="Slide navigation">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
     <line x1="4" y1="7"  x2="20" y2="7"/>
@@ -665,6 +735,24 @@
       toggle.setAttribute('aria-label', 'Collapse navigation');
       syncFab();
     });
+
+    // ─── Export to landscape PDF (reveal.js print-pdf view + browser print) ─
+    const exportBtn = document.getElementById('tocExport');
+    if (exportBtn) {
+      exportBtn.addEventListener('click', () => {
+        const url = new URL(location.href);
+        url.hash = '';
+        url.searchParams.set('print-pdf', '');
+        window.open(url.toString(), '_blank');
+      });
+    }
+    if (/print-pdf/gi.test(location.search)) {
+      document.body.classList.add('is-print-pdf');
+      const bar = document.getElementById('pdfPrintBar');
+      const printNow = document.getElementById('pdfPrintNow');
+      if (bar) bar.hidden = false;
+      if (printNow) printNow.addEventListener('click', () => window.print());
+    }
 
     build();
     highlight();
