@@ -636,6 +636,39 @@
 <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/markdown/markdown.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/notes/notes.js"></script>
+<script>
+  // Rebrand the reveal.js speaker-notes popup. The notes plugin writes the popup
+  // inline, hardcoding its title to "reveal.js - Speaker View" with no favicon.
+  // The popup is same-origin, so once the plugin has written its shell (detected
+  // via that title) we override the title and apply the deck's own favicon.
+  (function () {
+    const iconEl = document.querySelector('link[rel="icon"]');
+    const faviconHref = iconEl ? iconEl.href : null;
+    const faviconType = iconEl ? iconEl.getAttribute('type') : null;
+    const nativeOpen = window.open.bind(window);
+    window.open = function (url, name, features) {
+      const popup = nativeOpen(url, name, features);
+      if (popup && name === 'reveal.js - Notes') {
+        const timer = setInterval(() => {
+          if (popup.closed) return clearInterval(timer);
+          const doc = popup.document;
+          if (!doc || doc.title !== 'reveal.js - Speaker View') return;
+          doc.title = 'Speaker Notes';
+          if (faviconHref) {
+            const icon = doc.querySelector('link[rel="icon"]') || doc.createElement('link');
+            icon.rel = 'icon';
+            if (faviconType) icon.type = faviconType;
+            icon.href = faviconHref;
+            if (!icon.parentNode) doc.head.appendChild(icon);
+          }
+          clearInterval(timer);
+        }, 120);
+        setTimeout(() => clearInterval(timer), 6000);
+      }
+      return popup;
+    };
+  })();
+</script>
 <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/highlight.js"></script>
 <script>
   Reveal.initialize({
