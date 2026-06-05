@@ -176,3 +176,15 @@ Don't fragment every list. Use it for:
 - Multiple screenshots in one slide (split)
 - Decorative emoji (the brand isn't playful)
 - Dark mode — the app is light, the deck should match
+
+## Layout gotchas (learned the hard way)
+
+- **Role-cover blockquote** — keep blurbs short (~25 words). The template caps blockquote width at `38em` and wraps long text, but anything past ~40 words still looks awkward at slide scale.
+- **Role-cover h1** — long titles like "Role: Action Owner (Responsible Person)" wrap fine, but consider whether the parenthetical adds value or just noise.
+- **Walkthrough badge label** — keep `<span class="role-badge">` to ≤14 characters. The badge sits top-right; long labels get truncated with an ellipsis but lose meaning.
+- **Slide-number lives top-LEFT** — don't add absolute-positioned content there. The role-badge owns top-right.
+- **Status pills inline with text** — leave a space after the closing tag. Pills are `inline-block` and the adjacent word can otherwise look glued on.
+
+## PDF export — what works
+
+The template's "Export as PDF" button in the floating TOC panel opens `?print-pdf` in a new tab. reveal.js's print stylesheet (loaded synchronously in `<head>`) renders one print page per slide and the browser print dialog opens automatically. **Use Chrome or Edge** — Firefox's print preview occasionally misaligns the print pages. In the print dialog: Landscape, no margins, "Background graphics" on.

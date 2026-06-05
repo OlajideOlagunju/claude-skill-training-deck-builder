@@ -9,6 +9,21 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/white.css" id="theme">
+<script>
+  // PDF export. reveal.js's print mode is opt-in via ?print-pdf — the matching
+  // print stylesheet MUST be present in <head> BEFORE Reveal.initialize, so we
+  // inject it synchronously here. Without this, ?print-pdf produces one long
+  // scrolling page instead of one print page per slide.
+  (function () {
+    var isPrint = /print-pdf/gi.test(window.location.search);
+    var link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.type = 'text/css';
+    link.href = 'https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/css/print/' +
+                (isPrint ? 'pdf.css' : 'paper.css');
+    document.head.appendChild(link);
+  })();
+</script>
 <style>
   :root {
     --brand-primary: {{BRAND_PRIMARY}};
@@ -60,14 +75,21 @@
     border: 1px solid color-mix(in oklab, var(--brand-primary) 18%, transparent);
   }
   .reveal .progress { color: var(--brand-primary); height: 4px; }
-  .reveal .controls { color: var(--brand-primary); }
+  .reveal .controls { color: var(--brand-primary); bottom: 8px; right: 10px; }
+  /* Slide number lives top-LEFT so it never collides with the .role-badge
+     that sits top-right on every walkthrough slide. White-ish background +
+     dark text reads on both light and dark/branded backgrounds. */
   .reveal .slide-number {
-    background: rgba(0,0,0,0.04);
-    color: var(--brand-text);
+    top: 12px; left: 14px;
+    right: auto; bottom: auto;
+    background: rgba(255,255,255,0.88);
+    color: #333;
+    border: 1px solid rgba(0,0,0,0.08);
     border-radius: 4px;
-    padding: 0.15em 0.5em;
+    padding: 0.2em 0.55em;
     font-family: var(--font-mono);
     font-size: 0.7em;
+    z-index: 30;
   }
 
   /* ─── Inverted inline colors on dark / branded backgrounds ───────────── */
@@ -136,15 +158,19 @@
   }
 
   /* ─── Role chapter cover — branded with subtle texture ───────────────── */
+  /* No overflow:hidden on the section itself — long blockquotes need to
+     wrap, not be clipped. Padding 1.6em (was 2.5em) gives the text room
+     inside the 1280px slide canvas. The gradient/dot mask lives on the
+     ::before pseudo-element which IS clipped. */
   .reveal section.role-cover {
     background:
       radial-gradient(60% 50% at 25% 20%, rgba(255,255,255,0.16) 0%, transparent 60%),
       linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-primary-dark) 100%);
     color: white;
     text-align: left;
-    padding: 0 2.5em;
+    padding: 0 1.6em;
     position: relative;
-    overflow: hidden;
+    box-sizing: border-box;
   }
   .reveal section.role-cover::before {
     content: "";
@@ -154,35 +180,44 @@
     pointer-events: none;
     mask-image: linear-gradient(135deg, black 0%, black 40%, transparent 80%);
     -webkit-mask-image: linear-gradient(135deg, black 0%, black 40%, transparent 80%);
+    overflow: hidden;
   }
-  .reveal section.role-cover > * { position: relative; z-index: 1; }
+  .reveal section.role-cover > * { position: relative; z-index: 1; max-width: 100%; }
   .reveal section.role-cover h1 {
-    font-size: 2.7em;
+    font-size: 2.4em;
     font-weight: 800;
     letter-spacing: -0.022em;
-    margin: 0 0 0.5em 0;
+    margin: 0 0 0.55em 0;
+    max-width: 100%;
     overflow-wrap: break-word;
-    word-break: normal;
+    word-wrap: break-word;
+    hyphens: auto;
   }
   .reveal section.role-cover blockquote {
     background: transparent;
     border: none;
     box-shadow: none;
     font-style: normal;
-    font-size: 1.05em;
+    font-size: 1em;
     line-height: 1.55;
     margin: 0;
     padding: 0;
-    max-width: none;
-    width: 100%;
+    max-width: 38em;
+    width: auto;
     quotes: none;
     color: rgba(255,255,255,0.92);
+    overflow-wrap: break-word;
+    word-wrap: break-word;
   }
   .reveal section.role-cover blockquote::before { content: ""; display: block; width: 40px; height: 3px; background: rgba(255,255,255,0.6); margin-bottom: 1em; }
   .reveal section.role-cover blockquote::after { content: none; }
 
   /* ─── Walkthrough slide ───────────────────────────────────────────────── */
   .reveal section.walkthrough { text-align: left; padding: 0 1em; }
+  /* Cap the h2 max-width so long titles wrap before reaching the .role-badge
+     in the top-right corner. Without this, a title like "Add details,
+     evidence requirements, team" runs straight under the badge. */
+  .reveal section.walkthrough h2 { max-width: calc(100% - 7em); }
   .reveal .screenshot {
     max-width: 100%;
     max-height: 54vh;
@@ -281,18 +316,26 @@
   }
 
   /* ─── Role badge in slide corner ─────────────────────────────────────── */
+  /* Top-right corner — slide-number was moved to top-left so the two no
+     longer clash. Tight padding + ellipsis so a long label can't push off
+     the slide. */
   .role-badge {
     position: absolute;
-    top: 1em; right: 1em;
+    top: 0.9em; right: 0.9em;
     background: var(--brand-primary-light);
     color: var(--brand-primary-dark);
-    padding: 0.3em 0.9em;
+    padding: 0.28em 0.8em;
     border-radius: 999px;
-    font-size: 0.5em;
+    font-size: 0.48em;
     font-weight: 700;
     letter-spacing: 0.06em;
     text-transform: uppercase;
     border: 1px solid color-mix(in oklab, var(--brand-primary) 50%, transparent);
+    z-index: 5;
+    white-space: nowrap;
+    max-width: calc(100% - 2em);
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   /* ─── Status pills ───────────────────────────────────────────────────── */
@@ -486,37 +529,15 @@
   .toc-export:hover { filter: brightness(1.06); box-shadow: var(--shadow-md); }
   .toc-export svg { width: 15px; height: 15px; }
 
-  /* ─── Print-mode helper bar (only on screen in ?print-pdf view) ───────── */
+  /* ─── Print-mode hides UI chrome ─────────────────────────────────────── */
+  /* When ?print-pdf is in the URL, reveal.js's pdf.css (loaded in <head>)
+     takes over layout. Our extra UI gets out of the way for both the
+     print-pdf preview AND the browser's normal print dialog. */
   body.is-print-pdf .toc-panel,
-  body.is-print-pdf .toc-fab { display: none !important; }
-  .pdf-print-bar {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    z-index: 200;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
-    gap: 0.6em 1.1em;
-    padding: 0.7em 1.2em;
-    background: var(--brand-primary-dark);
-    color: white;
-    font-family: var(--font-body);
-    font-size: 0.92rem;
-    box-shadow: var(--shadow-md);
-  }
-  .pdf-print-bar strong { color: white; }
-  .pdf-print-bar button {
-    background: white;
-    color: var(--brand-primary-dark);
-    border: none;
-    border-radius: 6px;
-    padding: 0.45em 1.1em;
-    font-weight: 700;
-    cursor: pointer;
-  }
-  .pdf-print-bar button:hover { filter: brightness(0.96); }
-  @media print { .pdf-print-bar { display: none !important; } }
+  body.is-print-pdf .toc-fab,
+  body.is-print-pdf .reveal .controls,
+  body.is-print-pdf .reveal .progress,
+  body.is-print-pdf .reveal .slide-number { display: none !important; }
 
   @media (max-width: 1100px) {
     .toc-panel { width: 220px; }
@@ -610,10 +631,6 @@
     </button>
   </div>
 </aside>
-<div class="pdf-print-bar" id="pdfPrintBar" hidden>
-  <span>PDF export view. In the print dialog choose <strong>Layout: Landscape</strong>, <strong>Margins: None</strong>, and enable <strong>Background graphics</strong>.</span>
-  <button id="pdfPrintNow" type="button">Save as PDF</button>
-</div>
 <button class="toc-fab" id="tocFab" type="button" aria-label="Open slide navigation" title="Slide navigation">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
     <line x1="4" y1="7"  x2="20" y2="7"/>
@@ -769,22 +786,33 @@
       syncFab();
     });
 
-    // ─── Export to landscape PDF (reveal.js print-pdf view + browser print) ─
+    // ─── Export to landscape PDF ─────────────────────────────────────────
+    // The print stylesheet is loaded synchronously in <head> based on the
+    // URL — so here we just navigate to ?print-pdf in a new tab and trigger
+    // window.print() once reveal has rendered the print layout.
     const exportBtn = document.getElementById('tocExport');
     if (exportBtn) {
-      exportBtn.addEventListener('click', () => {
+      exportBtn.addEventListener('click', (e) => {
+        e.preventDefault();
         const url = new URL(location.href);
         url.hash = '';
         url.searchParams.set('print-pdf', '');
-        window.open(url.toString(), '_blank');
+        const win = window.open(url.toString(), '_blank', 'noopener');
+        if (!win) location.href = url.toString();
       });
     }
     if (/print-pdf/gi.test(location.search)) {
       document.body.classList.add('is-print-pdf');
-      const bar = document.getElementById('pdfPrintBar');
-      const printNow = document.getElementById('pdfPrintNow');
-      if (bar) bar.hidden = false;
-      if (printNow) printNow.addEventListener('click', () => window.print());
+      let printed = false;
+      const printOnce = () => {
+        if (printed) return;
+        printed = true;
+        setTimeout(() => window.print(), 250);
+      };
+      Reveal.on('pdf-ready', printOnce);
+      // Safety timeout — pdf-ready may never fire if slides.md is blocked
+      // by file:// CORS or similar.
+      setTimeout(printOnce, 4000);
     }
 
     build();
